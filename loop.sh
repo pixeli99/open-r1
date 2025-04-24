@@ -1,5 +1,5 @@
 # CUDA_VISIBLE_DEVICES=0 trl vllm-serve --model Qwen/Qwen2.5-1.5B-Instruct
-
+export LOOP_K_MAX=4
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 export HF_ENDPOINT=https://hf-mirror.com
 

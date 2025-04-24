@@ -1,6 +1,6 @@
 # CUDA_VISIBLE_DEVICES=0 trl vllm-serve --model Qwen/Qwen2.5-1.5B-Instruct
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=4,5,6,7
 export HF_ENDPOINT=https://hf-mirror.com
 
 # accelerate launch --config_file recipes/accelerate_configs/zero2.yaml --num_processes 7 src/open_r1/grpo.py\
