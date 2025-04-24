@@ -103,7 +103,7 @@ def main(script_args, training_args, model_args):
     ###################
     logger.info("*** Loading model ***")
     model = get_model(model_args, training_args)
-    model.config.loop_k_max = int(os.get_env("LOOP_K_MAX", 1))
+    model.config.loop_k_max = int(os.getenv("LOOP_K_MAX", 1))
     # ---- freeze bottom N transformer blocks + token/pos embedding ----
     for i, layer in enumerate(model.model.layers):      # Qwen2ForCausalLM → .model → .layers
         if i <= 20 or i >= 26:
