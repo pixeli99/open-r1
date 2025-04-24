@@ -103,11 +103,27 @@ def main(script_args, training_args, model_args):
     ###################
     logger.info("*** Loading model ***")
     model = get_model(model_args, training_args)
+    model.config.loop_k_max = 4
+    # ---- freeze bottom N transformer blocks + token/pos embedding ----
+    for i, layer in enumerate(model.model.layers):      # Qwen2ForCausalLM → .model → .layers
+        if i <= 20 or i >= 26:
+            layer.eval()                           # 关闭 dropout / rmsnorm noise
+            for p in layer.parameters():
+                p.requires_grad = False
+
+    for p in model.model.embed_tokens.parameters():
+        p.requires_grad = False
 
     if tokenizer.chat_template is None:
         logger.info("No chat template provided, using ChatML.")
         model, tokenizer = setup_chat_format(model, tokenizer, format="chatml")
 
+    def formatting_prompts_func(example):
+        output_texts = []
+        for i in range(len(example['problem'])):
+            text = f"### Question: {example['problem'][i]}\n ### Answer: {example['solution'][i]}"
+            output_texts.append(text)
+        return output_texts
     ############################
     # Initialize the SFT Trainer
     ############################
@@ -119,6 +135,7 @@ def main(script_args, training_args, model_args):
         processing_class=tokenizer,
         peft_config=get_peft_config(model_args),
         callbacks=get_callbacks(training_args, model_args),
+        formatting_func=formatting_prompts_func,
     )
 
     ###############
